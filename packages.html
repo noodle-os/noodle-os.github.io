@@ -53,61 +53,43 @@
         <div class="news">
             <h2>Packages</h2>
             <p>Browse packages managed by the noodle pkg manager:</p>
-            <ul id="package-list" class="package-list"></ul>
+
+            <ul id="package-list" class="package-list">
+            </ul>
         </div>
     </div>
 
     <script>
-        const apiUrl = "https://raw.githubusercontent.com/noodle-os/packages/main/package-db.noodle"; 
-        const cacheKey = "noodleOS_packages";
-        const cacheExpiryKey = "noodleOS_cacheExpiry";
-        const cacheDuration = 60 * 1000;
+        const apiUrl = "https://raw.githubusercontent.com/noodle-os/packages/refs/heads/main/package-db.noodle";
 
         async function fetchPackages() {
-        try {
-            console.log("Fetching new package data from GitHub...");
-            const timestamp = new Date().getTime();
-            const response = await fetch(`${apiUrl}?t=${timestamp}`, { cache: "no-store" });
+            try {
+                const response = await fetch(apiUrl);
+                const data = await response.text();
 
-            if (!response.ok) {
-                throw new Error(`HTTP error! Status: ${response.status}`);
+                const packageList = document.getElementById("package-list");
+
+                const packages = data.split('\n');
+
+                packages.forEach(packageData => {
+                    const [name, version, url] = packageData.split('|');
+
+                    if (name && version && url) {
+                        const listItem = document.createElement("li");
+                        listItem.classList.add("package-item");
+                        listItem.innerHTML = `<strong>${name}</strong> v${version} - <a href="${url}" target="_blank">Download</a>`;
+                        packageList.appendChild(listItem);
+                    }
+                });
+            } catch (error) {
+                console.error("Error fetching packages:", error);
+                const errorMessage = document.createElement("p");
+                errorMessage.innerHTML = "Failed to load package data.";
+                document.querySelector(".news").appendChild(errorMessage);
             }
-
-            const data = await response.text();
-
-            if (!data || data.trim() === "") {
-                throw new Error("Received empty package data.");
-            }
-
-            displayPackages(data);
-        } catch (error) {
-            console.error("Error fetching packages:", error);
-            document.querySelector(".news").innerHTML += `<p style="color:red;">Failed to load package data: ${error.message}</p>`;
         }
-    }
 
-    function displayPackages(data) {
-        const packageList = document.getElementById("package-list");
-        packageList.innerHTML = "";
-
-        const packages = data.split('\n').filter(line => line.trim() !== "");
-
-        packages.forEach(packageData => {
-            const [name, version, url] = packageData.split('|');
-
-            if (name && version && url) {
-                const listItem = document.createElement("li");
-                listItem.classList.add("package-item");
-                listItem.innerHTML = `<strong>${name}</strong> v${version} - <a href="${url}" target="_blank">Download</a>`;
-                packageList.appendChild(listItem);
-            } else {
-                console.warn("Skipping invalid package entry:", packageData);
-            }
-        });
-    }
-    
-    fetchPackages();
-
+        fetchPackages();
     </script>
 </body>
 </html>
