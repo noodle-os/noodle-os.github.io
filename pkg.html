@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NoodleOS</title>
+    <title>Package Details - NoodleOS</title>
     <style>
         body {
             font-family: monospace;
@@ -35,6 +35,10 @@
             border-top: 1px solid black;
             padding-top: 10px;
         }
+        .go-back {
+            text-decoration: none;
+            font-size: 1rem;
+        }
     </style>
 </head>
 <body>
@@ -47,49 +51,69 @@
             <a href="install.html">Installation</a> | 
             <a href="github.html">Github</a> | 
             <a href="docs.html">Documentation</a> | 
-            <u><a href="packages.html">Packages</a></u> | 
+            <a href="packages.html">Packages</a> | 
             <a href="support.html">Support</a>
         </nav>
-        <div class="news">
-            <h2>Packages</h2>
-            <p>Browse packages managed by the noodle pkg manager:</p>
+        
+        <!-- Go Back Link -->
+        <div class="go-back">
+            <a href="packages.html">Go Back to Packages</a>
+        </div>
 
-            <ul id="package-list" class="package-list">
-            </ul>
+        <div class="news">
+            <h2>Package Details - <a href="packages.html" class="go-back"><u>go back</u></a></h2>
+            <div id="package-details">
+                <!-- Package details will be injected here -->
+            </div>
         </div>
     </div>
 
     <script>
         const apiUrl = "https://raw.githubusercontent.com/noodle-os/packages/refs/heads/main/package-db.noodle";
 
-        async function fetchPackages() {
+        async function fetchPackageDetails(pkgName) {
             try {
                 const response = await fetch(apiUrl);
                 const data = await response.text();
 
-                const packageList = document.getElementById("package-list");
+                const packageList = data.split('\n');
+                let packageData = null;
 
-                const packages = data.split('\n');
+                packageList.forEach(packageInfo => {
+                    const [name, version, url, description] = packageInfo.split('|');
 
-                packages.forEach(packageData => {
-                    const [name, version, url, description] = packageData.split('|');
-
-                    if (name && version && url && description) {
-                        const listItem = document.createElement("li");
-                        listItem.classList.add("package-item");
-                        listItem.innerHTML = `<strong><a href="pkg.html?pkg=${name}">${name}</a></strong> v${version} - <a href="${url}" target="_blank">Download</a>`;
-                        packageList.appendChild(listItem);
+                    if (name === pkgName) {
+                        packageData = { name, version, url, description };
                     }
                 });
+
+                if (packageData) {
+                    const detailsDiv = document.getElementById("package-details");
+                    detailsDiv.innerHTML = `
+                        <h3><strong>${packageData.name} v${packageData.version}</strong></h3>
+                        <p><strong>Description:</strong> ${packageData.description}</p>
+                        <p><strong>Version:</strong> ${packageData.version}</p>
+                        <p><strong>Download:</strong> <a href="${packageData.url}" target="_blank">${packageData.name} v${packageData.version}</a></p>
+                    `;
+                } else {
+                    document.getElementById("package-details").innerHTML = "Package not found.";
+                }
             } catch (error) {
-                console.error("Error fetching packages:", error);
+                console.error("Error fetching package details:", error);
                 const errorMessage = document.createElement("p");
-                errorMessage.innerHTML = "Failed to load package data.";
+                errorMessage.innerHTML = "Failed to load package details.";
                 document.querySelector(".news").appendChild(errorMessage);
             }
         }
 
-        fetchPackages();
+        const urlParams = new URLSearchParams(window.location.search);
+        const pkgName = urlParams.get('pkg');
+
+        if (pkgName) {
+            fetchPackageDetails(pkgName);
+        } else {
+            document.getElementById("package-details").innerHTML = "No package selected.";
+        }
     </script>
 </body>
 </html>
