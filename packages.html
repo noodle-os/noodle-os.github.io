@@ -58,7 +58,7 @@
     </div>
 
     <script>
-        const apiUrl = "https://raw.githubusercontent.com/noodle-os/packages/refs/heads/main/package-db.noodle";
+        const apiUrl = "https://raw.githubusercontent.com/noodle-os/packages/main/package-db.noodle"; 
         const cacheKey = "noodleOS_packages";
         const cacheExpiryKey = "noodleOS_cacheExpiry";
         const cacheDuration = 60 * 1000; // 1 minute (60,000ms)
@@ -68,31 +68,41 @@
             const cachedData = localStorage.getItem(cacheKey);
             const cacheExpiry = localStorage.getItem(cacheExpiryKey);
 
-            if (cachedData && cacheExpiry && now < cacheExpiry) {
-                console.log("Loading pkgs from cache...");
+            if (cachedData && cacheExpiry && now < Number(cacheExpiry)) {
+                console.log("Loading packages from cache...");
                 displayPackages(cachedData);
                 return;
             }
 
             try {
-                console.log("Fetching new pkg data...");
-                const response = await fetch(apiUrl);
-                const data = await response.text();
+                console.log("Fetching new package data from GitHub...");
+                const response = await fetch(apiUrl, { cache: "no-cache" });
 
-                localStorage.setItem(cacheKey, data);
-                localStorage.setItem(cacheExpiryKey, now + cacheDuration);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+
+                const data = await response.text();
+                
+                if (!data || data.trim() === "") {
+                    throw new Error("Received empty package data.");
+                }
+
+                localStorage.setItem(cacheKey, data); // Save new data
+                localStorage.setItem(cacheExpiryKey, now + cacheDuration); // Set new expiry time
 
                 displayPackages(data);
             } catch (error) {
-                console.error("Error fetching pkgs:", error);
-                document.querySelector(".news").innerHTML += "<p>Failed to load pkg data.</p>";
+                console.error("Error fetching packages:", error);
+                document.querySelector(".news").innerHTML += `<p style="color:red;">Failed to load package data: ${error.message}</p>`;
             }
         }
 
         function displayPackages(data) {
             const packageList = document.getElementById("package-list");
-            packageList.innerHTML = "";
-            const packages = data.split('\n');
+            packageList.innerHTML = ""; // Clear old list
+
+            const packages = data.split('\n').filter(line => line.trim() !== ""); // Ignore empty lines
 
             packages.forEach(packageData => {
                 const [name, version, url] = packageData.split('|');
@@ -102,6 +112,8 @@
                     listItem.classList.add("package-item");
                     listItem.innerHTML = `<strong>${name}</strong> v${version} - <a href="${url}" target="_blank">Download</a>`;
                     packageList.appendChild(listItem);
+                } else {
+                    console.warn("Skipping invalid package entry:", packageData);
                 }
             });
         }
