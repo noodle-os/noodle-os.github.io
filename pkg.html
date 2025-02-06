@@ -3,67 +3,26 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Package Details - NoodleOS</title>
-    <style>
-        body {
-            font-family: monospace;
-            background: white;
-            color: black;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            margin: 0;
-            flex-direction: column;
-        }
-        .container {
-            text-align: center;
-            max-width: 800px;
-        }
-        a {
-            color: black;
-            text-decoration: none;
-        }
-        .news {
-            margin-top: 20px;
-            text-align: left;
-            border-top: 1px solid black;
-            padding-top: 10px;
-        }
-        .faq {
-            margin-top: 20px;
-            text-align: left;
-            border-top: 1px solid black;
-            padding-top: 10px;
-        }
-        .go-back {
-            text-decoration: none;
-            font-size: 1rem;
-        }
-    </style>
+    <title>NoodleOS</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <div class="container">
-        <h1><a href="index.html">NoodleOS</a></h1>
+        <h1><a href="index">NoodleOS</a></h1>
         <p>A lightweight and fast Linux-based CLI operating system for programmers and hobbyists.</p>
         <p>NoodleOS is designed to be ultra-minimal, using only 5MB of storage and 10.8MB of RAM, making it perfect for older hardware or embedded systems. It features a custom package manager called noodle, designed to handle package installation and updates efficiently in a minimal environment.</p>
         <nav>
-            <a href="download.html">Download</a> | 
-            <a href="install.html">Installation</a> | 
-            <a href="github.html">Github</a> | 
-            <a href="docs.html">Documentation</a> | 
-            <a href="packages.html">Packages</a> | 
-            <a href="support.html">Support</a>
+            <a href="download">Download</a> | 
+            <a href="install">Installation</a> | 
+            <a href="github">Github</a> | 
+            <a href="docs">Documentation</a> | 
+            <a href="packages">Packages</a> | 
+            <a href="support">Support</a>
         </nav>
-        
-        <!-- Go Back Link -->
-        <div class="go-back">
-            <a href="packages.html">Go Back to Packages</a>
-        </div>
 
-        <div class="news">
-            <h2>Package Details - <a href="packages.html" class="go-back"><u>go back</u></a></h2>
+        <div class="panel">
+            <h2>Package Details - <a href="packages" class="go-back"><u>go back</u></a></h2>
             <div id="package-details">
-                <!-- Package details will be injected here -->
             </div>
         </div>
     </div>
@@ -93,7 +52,7 @@
                         <h3><strong>${packageData.name} v${packageData.version}</strong></h3>
                         <p><strong>Description:</strong> ${packageData.description}</p>
                         <p><strong>Version:</strong> ${packageData.version}</p>
-                        <p><strong>Download:</strong> <a href="${packageData.url}" target="_blank">${packageData.name} v${packageData.version}</a></p>
+                        <p><strong>Download:</strong> <u><a href="${packageData.url}" target="_blank">${packageData.name} v${packageData.version}</a></u></p>
                     `;
                 } else {
                     document.getElementById("package-details").innerHTML = "Package not found.";

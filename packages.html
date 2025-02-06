@@ -4,53 +4,22 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>NoodleOS</title>
-    <style>
-        body {
-            font-family: monospace;
-            background: white;
-            color: black;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            margin: 0;
-            flex-direction: column;
-        }
-        .container {
-            text-align: center;
-            max-width: 800px;
-        }
-        a {
-            color: black;
-            text-decoration: none;
-        }
-        .news {
-            margin-top: 20px;
-            text-align: left;
-            border-top: 1px solid black;
-            padding-top: 10px;
-        }
-        .faq {
-            margin-top: 20px;
-            text-align: left;
-            border-top: 1px solid black;
-            padding-top: 10px;
-        }
-    </style>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <div class="container">
-        <h1><a href="index.html">NoodleOS</a></h1>
+        <h1><a href="index">NoodleOS</a></h1>
         <p>A lightweight and fast Linux-based CLI operating system for programmers and hobbyists.</p>
         <p>NoodleOS is designed to be ultra-minimal, using only 5MB of storage and 10.8MB of RAM, making it perfect for older hardware or embedded systems. It features a custom package manager called noodle, designed to handle package installation and updates efficiently in a minimal environment.</p>
         <nav>
-            <a href="download.html">Download</a> | 
-            <a href="install.html">Installation</a> | 
-            <a href="github.html">Github</a> | 
-            <a href="docs.html">Documentation</a> | 
-            <u><a href="packages.html">Packages</a></u> | 
-            <a href="support.html">Support</a>
+            <a href="download">Download</a> | 
+            <a href="install">Installation</a> | 
+            <a href="github">Github</a> | 
+            <a href="docs">Documentation</a> | 
+            <u><a href="packages">Packages</a></u> | 
+            <a href="support">Support</a>
         </nav>
-        <div class="news">
+        <div class="panel">
             <h2>Packages</h2>
             <p>Browse packages managed by the noodle pkg manager:</p>
 
@@ -77,7 +46,7 @@
                     if (name && version && url && description) {
                         const listItem = document.createElement("li");
                         listItem.classList.add("package-item");
-                        listItem.innerHTML = `<strong><a href="pkg.html?pkg=${name}">${name}</a></strong> v${version} - <a href="${url}" target="_blank">Download</a>`;
+                        listItem.innerHTML = `<strong><a href="pkg.html?pkg=${name}">${name}</a></strong> v${version} - <u><a href="${url}" target="_blank">Download</a></u>`;
                         packageList.appendChild(listItem);
                     }
                 });
