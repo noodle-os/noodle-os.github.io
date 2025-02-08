@@ -26,6 +26,9 @@
         </nav>
         <div class="panel">
             <h2>Packages</h2>
+            <div class="search-container">
+                <input type="text" id="search-bar" placeholder="Search for a package..." />
+            </div>            
             <p>Browse packages managed by the noodle pkg manager:</p>
 
             <ul id="package-list" class="package-list">
@@ -36,6 +39,8 @@
     <script>
         const apiUrl = "https://raw.githubusercontent.com/noodle-os/packages/refs/heads/main/package-db.noodle";
 
+        let allPackages = [];
+
         async function fetchPackages() {
             try {
                 const response = await fetch(apiUrl);
@@ -45,16 +50,17 @@
 
                 const packages = data.split('\n');
 
+                allPackages = [];
+
                 packages.forEach(packageData => {
                     const [name, version, url, description] = packageData.split('|');
 
                     if (name && version && url && description) {
-                        const listItem = document.createElement("li");
-                        listItem.classList.add("package-item");
-                        listItem.innerHTML = `<strong><a href="pkg.html?pkg=${name}">${name}</a></strong> v${version} - <u><a href="${url}" target="_blank">Download</a></u>`;
-                        packageList.appendChild(listItem);
+                        allPackages.push({ name, version, url, description });
                     }
                 });
+
+                displayPackages(allPackages);
             } catch (error) {
                 console.error("Error fetching packages:", error);
                 const errorMessage = document.createElement("p");
@@ -63,7 +69,31 @@
             }
         }
 
+        function displayPackages(packages) {
+            const packageList = document.getElementById("package-list");
+            packageList.innerHTML = '';
+
+            packages.forEach(packageData => {
+                const { name, version, url } = packageData;
+                const listItem = document.createElement("li");
+                listItem.classList.add("package-item");
+                listItem.innerHTML = `<strong><a href="pkg.html?pkg=${name}">${name}</a></strong> v${version} - <u><a href="${url}" target="_blank">Download</a></u>`;
+                packageList.appendChild(listItem);
+            });
+        }
+
+        document.getElementById("search-bar").addEventListener("input", function () {
+            const query = this.value.toLowerCase();
+
+            const filteredPackages = allPackages.filter(packageData => {
+                return packageData.name.toLowerCase().includes(query);
+            });
+
+            displayPackages(filteredPackages);
+        });
+
         fetchPackages();
+
     </script>
 </body>
 </html>
